@@ -7,6 +7,5 @@ Release/*
 .pio/
 .vscode/
 myFilter.cpp
-my*.h
 !my*.example.h
 compile_commands.json
