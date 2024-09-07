@@ -1,3 +1,4 @@
+#include "aspects.h"
 // REFERENCE
 // SERVO_TURNOUT(id, pin, active_angle, inactive_angle, profile [, "description"])
 
@@ -29,25 +30,22 @@ SERVO_TURNOUT(107, 134, 200, 400, Medium, "Lead-Yard")
 
 AUTOSTART
 // TODO: predefine start values/positions
-AMBER(111)
-AMBER(115)
+APPROACH(111, 115)
 
-AMBER(154)
-AMBER(158)
+//STOP(154, 158)
+
 PRINT("Autostart")
 DONE
 
 ONTHROW(101)
   // left main -> lead
-  RED(111)
-  AMBER(115)
+  APPROACH(111, 115)
   PRINT("Throw")
   DONE
 
 ONCLOSE(101)
   // left main -> main
-  GREEN(111)
-  RED(115)
+  CLEAR(111, 115)
   
   // main -> left main
   GREEN(0)
