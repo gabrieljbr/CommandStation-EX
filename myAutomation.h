@@ -11,7 +11,7 @@ SIGNAL(105, 0, 104) // [S 105] M1->LMain
 SIGNAL(107, 106, 0) // [S 115] Lead->LMain
 
 // [T 101 Left-Main-Lead]
-SERVO_TURNOUT(101, 101, 255, 210, Medium, "Left-Main-Lead")
+SERVO_TURNOUT(CP_101, 101, 255, 210, Medium, "Left-Main-Lead")
 
 // ---------------------
 
@@ -23,7 +23,7 @@ SIGNAL(161, 0, 160) // [S 161] M1->RMain
 SIGNAL(163, 162, 0) // [S 163] M2->RMain
 
 // [T 102 Right-Main-Main2]
-SERVO_TURNOUT(102, 148, 200, 370, Medium, "Right-Main-Main2")
+SERVO_TURNOUT(CP_102, 148, 200, 370, Medium, "Right-Main-Main2")
 
 // ---------------------
 
@@ -41,25 +41,25 @@ ONCHANGE_TURNOUT_102()
 
 DONE
 
-ONCLOSE(101)
+ONCLOSE(CP_101)
 
   ONCHANGE_TURNOUT_101()
 
   DONE
 
-ONTHROW(101)
+ONTHROW(CP_101)
 
   ONCHANGE_TURNOUT_101()
 
   DONE
 
-ONCLOSE(102)
+ONCLOSE(CP_102)
 
   ONCHANGE_TURNOUT_102()
 
   DONE
 
-ONTHROW(102)
+ONTHROW(CP_102)
 
   ONCHANGE_TURNOUT_102()
 
