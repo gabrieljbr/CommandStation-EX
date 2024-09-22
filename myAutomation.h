@@ -27,11 +27,14 @@ SERVO_TURNOUT(CP_102, 148, 200, 370, Medium, "Right-Main-Main2")
 
 // ---------------------
 
-// --
+// ----Crossover----
+SIGNAL(138, 137, 136) // [S 138] M1-M1-M2
 SERVO_TURNOUT(103, 116, 400, 290, Medium, "Crossover-Main-Lead")
 SERVO_TURNOUT(104, 117, 450, 250, Medium, "Crossover-Lead-Main")
 SERVO_TURNOUT(105, 118, 150, 240, Medium, "Crossover-Main-Main2")
 SERVO_TURNOUT(106, 133, 475, 300, Medium, "Crossover-Main2-Main")
+
+// --
 SERVO_TURNOUT(107, 134, 200, 400, Medium, "Lead-Yard")
 
 AUTOSTART
@@ -62,5 +65,53 @@ ONCLOSE(CP_102)
 ONTHROW(CP_102)
 
   ONCHANGE_TURNOUT_102()
+
+  DONE
+
+ONCLOSE(CP_103)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+
+ONTHROW(CP_103)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+  
+ONCLOSE(CP_104)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+
+ONTHROW(CP_104)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+  
+ONCLOSE(CP_105)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+
+ONTHROW(CP_105)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+  
+ONCLOSE(CP_106)
+
+  ONCHANGE_CROSSOVER()
+
+  DONE
+
+ONTHROW(CP_106)
+
+  ONCHANGE_CROSSOVER()
 
   DONE

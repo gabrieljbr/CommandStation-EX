@@ -14,6 +14,14 @@
 #define M1_R_MAIN 161
 #define M2_R_MAIN 163
 
+// CROSSOVER
+// 103/104 - 105/106
+#define CP_103 103
+#define CP_104 104
+#define CP_105 105
+#define CP_106 106
+#define M1_M1_M2 138
+
 #define ONCHANGE_TURNOUT_101() \
   IFCLOSED(CP_101) \
     CLEAR_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
@@ -34,4 +42,21 @@
     APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
     STOP_ONE_HEAD(M1_R_MAIN) \
     APPROACH_ONE_HEAD(M2_R_MAIN) \
+  ENDIF
+
+#define ONCHANGE_CROSSOVER() \
+  IFCLOSED(CP_105) \
+    IFCLOSED(CP_103) \
+      IFGREEN(M1_L_MAIN) \
+        CLEAR_ONE_HEAD(M1_M1_M2) \
+      ENDIF \
+
+      IFRED(M1_L_MAIN) \
+        APPROACH_ONE_HEAD(M1_M1_M2) \
+      ENDIF \
+    ELSE \
+      STOP_ONE_HEAD(M1_M1_M2) \
+    ENDIF \
+  ELSE \
+    STOP_ONE_HEAD(M1_M1_M2) \
   ENDIF
