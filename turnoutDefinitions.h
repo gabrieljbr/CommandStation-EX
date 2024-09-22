@@ -50,7 +50,6 @@
       IFGREEN(M1_L_MAIN) \
         CLEAR_ONE_HEAD(M1_M1_M2) \
       ENDIF \
-
       IFRED(M1_L_MAIN) \
         APPROACH_ONE_HEAD(M1_M1_M2) \
       ENDIF \
