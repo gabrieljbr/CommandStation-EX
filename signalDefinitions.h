@@ -1,0 +1,84 @@
+#include "signalStates.h"
+
+// CP 101
+#define CP_101 101
+#define L_MAIN_M1 111
+#define L_MAIN_LEAD 115
+#define M1_L_MAIN 105
+#define LEAD_L_MAIN 107
+
+// CP 102
+#define CP_102 102
+#define R_MAIN_M1 154
+#define R_MAIN_M2 158
+#define M1_R_MAIN 161
+#define M2_R_MAIN 163
+
+// CROSSOVER
+// 103/104 - 105/106
+#define CP_103 103
+#define CP_104 104
+#define CP_105 105
+#define CP_106 106
+#define M1_M1_M2 138
+#define M1_M1 121
+#define M1_M2_M2 124
+#define M1_YARD 127
+
+#define SET_LMAINM1_LMAINLEAD() \
+  IFCLOSED(CP_101) \
+    CLEAR_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
+  ELSE \
+    APPROACH_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
+  ENDIF
+
+#define SET_M1LMAIN() \
+  IFCLOSED(CP_101) \
+    CLEAR_ONE_HEAD(M1_L_MAIN) \
+  ELSE \
+    STOP_ONE_HEAD(M1_L_MAIN) \
+  ENDIF
+
+#define SET_LEADLMAIN() \
+  IFCLOSED(CP_101) \
+    STOP_ONE_HEAD(LEAD_L_MAIN) \
+  ELSE \
+    APPROACH_ONE_HEAD(LEAD_L_MAIN) \
+  ENDIF
+
+#define SET_RMAINM1_RMAINM2() \
+  IFCLOSED(CP_102) \
+    CLEAR_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+  ELSE \
+    APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+  ENDIF
+
+#define SET_M1RMAIN() \
+  IFCLOSED(CP_102) \
+    CLEAR_ONE_HEAD(M1_R_MAIN) \
+  ELSE \
+    STOP_ONE_HEAD(M1_R_MAIN) \
+  ENDIF
+
+#define SET_M2RMAIN() \
+  IFCLOSED(CP_102) \
+    STOP_ONE_HEAD(M2_R_MAIN) \
+  ELSE \
+    APPROACH_ONE_HEAD(M2_R_MAIN) \
+  ENDIF
+
+#define SET_M1M1M2() \
+  IFCLOSED(CP_105) \
+    IFCLOSED(CP_103) \
+      IFGREEN(M1_L_MAIN) \
+        CLEAR_ONE_HEAD(M1_M1_M2) \
+      ENDIF \
+      IFRED(M1_L_MAIN) \
+        APPROACH_ONE_HEAD(M1_M1_M2) \
+      ENDIF \
+    ELSE \
+      STOP_ONE_HEAD(M1_M1_M2) \
+    ENDIF \
+  ELSE \
+    STOP_ONE_HEAD(M1_M1_M2) \
+  ENDIF

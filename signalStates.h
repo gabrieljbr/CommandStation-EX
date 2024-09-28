@@ -6,3 +6,10 @@
 // TWO HEADS
 #define CLEAR_TWO_HEADS(top, bottom) GREEN(top) RED(bottom)
 #define APPROACH_TWO_HEADS(top, bottom) RED(top) AMBER(bottom)
+
+// THREE HEADS
+#define CLEAR_THREE_HEADS(top, middle, bottom) GREEN(top) RED(middle) RED(bottom)
+#define APPROACH_THREE_HEADS(top, middle, bottom) AMBER(top) RED(middle) RED(bottom)
+#define STOP_THREE_HEADS(top, middle, bottom) RED(top) RED(middle) RED(bottom)
+#define DIVERGING_APPROACH_THREE_HEADS(top, middle, bottom) RED(top) AMBER(middle) RED(bottom)
+#define DIVERGING_RESTRICTED_DIVERGING_THREE_HEADS(top, middle, bottom) RED(top) RED(middle) RED(bottom)
