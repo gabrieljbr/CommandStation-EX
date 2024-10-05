@@ -29,7 +29,7 @@
   IFCLOSED(CP_101) \
     CLEAR_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
   ELSE \
-    APPROACH_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
+    DIVERGING_APPROACH_TWO_HEADS(L_MAIN_M1, L_MAIN_LEAD) \
   ENDIF
 
 #define SET_M1LMAIN() \
@@ -48,9 +48,17 @@
 
 #define SET_RMAINM1_RMAINM2() \
   IFCLOSED(CP_102) \
-    CLEAR_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+    IFGREEN(M1_M1_M2) \
+      CLEAR_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+    ELSE \
+      IFAMBER(M1_M1_M2) \
+        ADVANCE_APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+      ELSE \
+        DIVERGING_APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+      ENDIF \
+    ENDIF \
   ELSE \
-    APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+    DIVERGING_APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
   ENDIF
 
 #define SET_M1RMAIN() \
@@ -67,7 +75,7 @@
     APPROACH_ONE_HEAD(M2_R_MAIN) \
   ENDIF
 
-#define SET_M1M1M2() \
+#define SET_M1M1() \
   IFCLOSED(CP_105) \
     IFCLOSED(CP_103) \
       IFGREEN(M1_L_MAIN) \
@@ -81,4 +89,64 @@
     ENDIF \
   ELSE \
     STOP_ONE_HEAD(M1_M1_M2) \
+  ENDIF
+
+#define SET_M2M1LEAD() \
+  IFCLOSED(CP_106) \
+    IFCLOSED(CP_107) \
+      IFCLOSED(CP_104) \
+        CLEAR_TWO_HEADS(xxx, xxx) \
+      ELSE \
+        ADVANCE_APPROACH_TWO_HEADS(xxx, xxx) \
+      ENDIF \
+    ELSE \
+      STOP_TWO_HEADS(xxx, xxx) \
+    ENDIF \
+  ELSE \
+    IFCLOSED(CP_104) \
+      ADVANCE_APPROACH_TWO_HEADS(xxx, xxx) \
+    ELSE \
+      STOP_TWO_HEADS(xxx, xxx) \
+    ENDIF \
+  ENDIF
+
+#define SET_M1M1M2() \
+  IFCLOSED(CP_103) \
+    IFCLOSED(CP_105) \
+      CLEAR_THREE_HEADS(xxx, xxx, xxx) \
+    ELSE \
+      DIVERGING_APPROACH_THREE_HEADS(xxx, xxx, xxx) \
+    ENDIF \
+  ELSE \
+    IFCLOSED(CP_107) \
+      IFCLOSED(CP_105) \
+        DIVERGING_APPROACH_THREE_HEADS(xxx, xxx, xxx) \
+      ELSE \
+        STOP_THREE_HEADS(xxx, xxx, xxx) \
+      ENDIF \
+    ELSE \
+      DIVERGING_RESTRICTED_DIVERGING_THREE_HEADS(xxx, xxx, xxx) \
+    ENDIF \
+  ENDIF
+
+#define SET_LEADM2() \
+  IFCLOSED(CP_104) \
+    IFCLOSED(CP_107) \
+      IFCLOSED(CP_106) \
+        CLEAR_TWO_HEADS(xxx, xxx) \
+      ELSE \
+        STOP_TWO_HEADS(xxx, xxx) \
+      ENDIF \
+    ELSE \
+      DIVERGING_RESTRICTED_TWO_HEADS(xxx, xxx) \
+    ENDIF \
+  ELSE \
+    STOP_TWO_HEADS(xxx, xxx) \
+  ENDIF
+
+#define SET_YARD() \
+  IFCLOSED(CP_107) \
+    STOP_ONE_HEAD(xxx) \
+  ELSE \
+    APPROACH_ONE_HEAD(xxx) \
   ENDIF
