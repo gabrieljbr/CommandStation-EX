@@ -20,10 +20,22 @@
 #define CP_104 104
 #define CP_105 105
 #define CP_106 106
+// M1M1
 #define M1_M1_M2 138
-#define M1_M1 121
-#define M1_M2_M2 124
+// M1M1M2
+#define M1_M1 122
+#define M1_M2 125
 #define M1_YARD 127
+// M2M1LEAD
+#define M2_M1 142
+#define M2_LEAD 144
+// LEADM2
+#define LEAD_M2 129
+#define LEAD_YARD 130
+
+// YARD
+#define YARD_EXIT 107
+#define YARD 147
 
 #define SET_LMAINM1_LMAINLEAD() \
   IFCLOSED(CP_101) \
@@ -52,9 +64,9 @@
       CLEAR_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
     ELSE \
       IFAMBER(M1_M1_M2) \
-        ADVANCE_APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+        APPROACH_MEDIUM_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
       ELSE \
-        DIVERGING_APPROACH_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
+        APPROACH_MEDIUM_TWO_HEADS(R_MAIN_M1, R_MAIN_M2) \
       ENDIF \
     ENDIF \
   ELSE \
@@ -95,16 +107,21 @@
   IFCLOSED(CP_106) \
     IFCLOSED(CP_107) \
       IFCLOSED(CP_104) \
-        CLEAR_TWO_HEADS(xxx, xxx) \
+        IFAMBER(LEAD_L_MAIN) \
+          APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
+        ENDIF \
+        IFRED(LEAD_L_MAIN) \
+          APPROACH_TWO_HEADS(xxx, xxx) \
+        ENDIF \
       ELSE \
-        ADVANCE_APPROACH_TWO_HEADS(xxx, xxx) \
+        DIVERGING_APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
       ENDIF \
     ELSE \
       STOP_TWO_HEADS(xxx, xxx) \
     ENDIF \
   ELSE \
     IFCLOSED(CP_104) \
-      ADVANCE_APPROACH_TWO_HEADS(xxx, xxx) \
+      DIVERGING_APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
     ELSE \
       STOP_TWO_HEADS(xxx, xxx) \
     ENDIF \

@@ -28,17 +28,30 @@ SERVO_TURNOUT(CP_102, 148, 200, 370, Medium, "Right-Main-Main2")
 // ---------------------
 
 // ----Crossover----
-SIGNAL(138, 137, 136) // [S 138] M1-M1-M2
-SIGNAL(121, 120, 119) // [S 121] M1-M1
-SIGNAL(124, 123, 0) // [S 124] M1-M2-M2
-SIGNAL(127, 0, 0) // [S 127] M1-YARD
-SERVO_TURNOUT(103, 116, 400, 290, Medium, "Crossover-Main-Lead")
-SERVO_TURNOUT(104, 117, 450, 250, Medium, "Crossover-Lead-Main")
-SERVO_TURNOUT(105, 118, 150, 240, Medium, "Crossover-Main-Main2")
-SERVO_TURNOUT(106, 133, 475, 300, Medium, "Crossover-Main2-Main")
+// --M1M1
+SIGNAL(M1_M1_M2, 137, 136) // [S 138] M1-M1
 
-// --
-SERVO_TURNOUT(107, 134, 200, 400, Medium, "Lead-Yard")
+// --M1M1M2
+SIGNAL(M1_M1, 121, 120) // [S 122] M1-M1
+SIGNAL(M1_M2, 124, 0) // [S 125] M1-M2
+SIGNAL(M1_YARD, 0, 0) // [S 127] M1-YARD
+
+// --M2M1LEAD
+SIGNAL(M2_M1, 141, 140) // [S 142] M2-M1
+SIGNAL(M2_LEAD, 143, 0) // [S 144] M2-LEAD
+
+// --LEADM2
+SIGNAL(LEAD_M2, 128, 0) // [S 129] LEAD-M2
+SIGNAL(LEAD_YARD, 0, 0) // [S 130] LEAD-YARD
+
+SERVO_TURNOUT(CP_103, 116, 400, 290, Medium, "Crossover-Main-Lead")
+SERVO_TURNOUT(CP_104, 117, 450, 250, Medium, "Crossover-Lead-Main")
+SERVO_TURNOUT(CP_105, 118, 150, 240, Medium, "Crossover-Main-Main2")
+SERVO_TURNOUT(CP_106, 133, 475, 300, Medium, "Crossover-Main2-Main")
+
+// ----Yard----
+SERVO_TURNOUT(YARD_EXIT, 134, 200, 400, Medium, "Lead-Yard")
+SIGNAL(YARD, 146, 0) // [S 147] YARD
 
 AUTOSTART
 

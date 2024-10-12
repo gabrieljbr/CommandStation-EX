@@ -5,8 +5,10 @@
 
 // TWO HEADS
 #define CLEAR_TWO_HEADS(top, bottom) GREEN(top) RED(bottom)
+#define APPROACH_TWO_HEADS(top, bottom) AMBER(bottom) RED(top)
+#define APPROACH_MEDIUM_TWO_HEADS(top, bottom) AMBER(bottom) RED(top) // flashing
 #define DIVERGING_APPROACH_TWO_HEADS(top, bottom) RED(top) AMBER(bottom)
-#define ADVANCE_APPROACH_TWO_HEADS(top, bottom) RED(top) AMBER(bottom) // flashing
+#define DIVERGING_APPROACH_MEDIUM_TWO_HEADS(top, bottom) RED(top) AMBER(bottom) // flashing
 #define STOP_TWO_HEADS(top, bottom) RED(top) RED(bottom)
 #define DIVERGING_RESTRICTED_TWO_HEADS(top, bottom) RED(top) RED(bottom) // flashing
 
