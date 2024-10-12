@@ -108,22 +108,22 @@
     IFCLOSED(CP_107) \
       IFCLOSED(CP_104) \
         IFAMBER(LEAD_L_MAIN) \
-          APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
+          APPROACH_MEDIUM_TWO_HEADS(M2_M1, M2_LEAD) \
         ENDIF \
         IFRED(LEAD_L_MAIN) \
-          APPROACH_TWO_HEADS(xxx, xxx) \
+          APPROACH_TWO_HEADS(M2_M1, M2_LEAD) \
         ENDIF \
       ELSE \
-        DIVERGING_APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
+        DIVERGING_APPROACH_MEDIUM_TWO_HEADS(M2_M1, M2_LEAD) \
       ENDIF \
     ELSE \
-      STOP_TWO_HEADS(xxx, xxx) \
+      STOP_TWO_HEADS(M2_M1, M2_LEAD) \
     ENDIF \
   ELSE \
     IFCLOSED(CP_104) \
-      DIVERGING_APPROACH_MEDIUM_TWO_HEADS(xxx, xxx) \
+      DIVERGING_APPROACH_MEDIUM_TWO_HEADS(M2_M1, M2_LEAD) \
     ELSE \
-      STOP_TWO_HEADS(xxx, xxx) \
+      STOP_TWO_HEADS(M2_M1, M2_LEAD) \
     ENDIF \
   ENDIF
 
