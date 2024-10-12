@@ -155,15 +155,20 @@
   IFCLOSED(CP_104) \
     IFCLOSED(CP_107) \
       IFCLOSED(CP_106) \
-        CLEAR_TWO_HEADS(xxx, xxx) \
+        IFAMBER(M2_R_MAIN) \
+          APPROACH_MEDIUM_TWO_HEADS(LEAD_M2, LEAD_YARD) \
+        ENDIF \
+        IFRED(M2_R_MAIN) \
+          APPROACH_TWO_HEADS(LEAD_M2, LEAD_YARD) \
+        ENDIF \
       ELSE \
-        STOP_TWO_HEADS(xxx, xxx) \
+        STOP_TWO_HEADS(LEAD_M2, LEAD_YARD) \
       ENDIF \
     ELSE \
-      DIVERGING_RESTRICTED_TWO_HEADS(xxx, xxx) \
+      DIVERGING_RESTRICTED_TWO_HEADS(LEAD_M2, LEAD_YARD) \
     ENDIF \
   ELSE \
-    STOP_TWO_HEADS(xxx, xxx) \
+    STOP_TWO_HEADS(LEAD_M2, LEAD_YARD) \
   ENDIF
 
 #define SET_YARD() \
