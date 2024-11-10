@@ -25,6 +25,7 @@
 #include "FSH.h"
 #include "IODevice.h"
 #include "Turnouts.h"
+#include "flashingSignals.h"
    
 // The following are the operation codes (or instructions) for a kind of virtual machine.
 // Each instruction is normally 3 bytes long with an operation code followed by a parameter.
@@ -62,6 +63,9 @@ enum OPCODE : byte {OPCODE_THROW,OPCODE_CLOSE,
              OPCODE_ONCHANGE,
              OPCODE_ONCLOCKTIME,
              OPCODE_ONTIME,
+             OPCODE_FLASHING_RED,
+             OPCODE_FLASHING_AMBER,
+             OPCODE_FLASHING_GREEN,
 
              // OPcodes below this point are skip-nesting IF operations
              // placed here so that they may be skipped as a group
@@ -153,6 +157,12 @@ private:
     static bool getFlag(VPIN id,byte mask); 
     static int16_t progtrackLocoId;
     static void doSignal(int16_t id,char rag); 
+    static void handleFlashing(int16_t id, char rag); 
+    static void flashSignal(int16_t pin, int16_t id);
+    static SignalState& getSignalState(int16_t pin, int16_t id);
+    static SignalState* getSignalStateIfExisting(int16_t pin);
+    static void addNewSignal(SignalState newSignal);
+    static void manageFlashing();
     static bool isSignal(int16_t id,char rag); 
     static int16_t getSignalSlot(int16_t id);
     static void setTurnoutHiddenState(Turnout * t);

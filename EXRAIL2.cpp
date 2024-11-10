@@ -52,6 +52,7 @@
 #include "Turnouts.h"
 #include "CommandDistributor.h"
 #include "TrackManager.h"
+#include "flashingSignals.h"
 
 // Command parsing keywords
 const int16_t HASH_KEYWORD_EXRAIL=15435;    
@@ -569,7 +570,7 @@ bool RMFT2::skipIfBlock() {
 }
 
 void RMFT2::loop() {
-
+  manageFlashing();
   // Round Robin call to a RMFT task each time
   if (loopTask==NULL) return;
   loopTask=loopTask->next;
@@ -819,6 +820,18 @@ void RMFT2::loop2() {
     
   case OPCODE_GREEN:
     doSignal(operand,SIGNAL_GREEN);
+    break;
+
+  case OPCODE_FLASHING_RED:
+    handleFlashing(operand, SIGNAL_RED);
+    break;
+
+  case OPCODE_FLASHING_AMBER:
+    handleFlashing(operand, SIGNAL_AMBER);
+    break;
+
+  case OPCODE_FLASHING_GREEN:
+    handleFlashing(operand, SIGNAL_GREEN);
     break;
     
   case OPCODE_FON:
@@ -1088,7 +1101,14 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
    
   // Manage invert (HIGH on) pins
   bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
-      
+
+  SignalState* signal = getSignalStateIfExisting(id);
+  if (signal != nullptr) {
+    signal->isFlashing = false;
+    signal->isOn = false;
+    signal->lastFlashTime = 0;
+  }
+
   // set the three pins 
   if (redpin) {
     bool redval=(rag==SIGNAL_RED || rag==SIMAMBER);
@@ -1105,6 +1125,129 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
     if (!aHigh) greenval=!greenval;
     IODevice::write(greenpin,greenval);
   }
+}
+
+void RMFT2::handleFlashing(int16_t id, char rag) {
+    // Assuming 'id' includes information like signal type and the color to blink
+    // Here, you can control the flashing of the signal.
+    
+    // Get the signal's configuration
+    int16_t sigslot = getSignalSlot(id);
+    if (sigslot<0) return; 
+  
+    // keep track of signal state 
+    setFlag(sigslot,rag,SIGNAL_MASK);
+    
+    int16_t sigpos = sigslot * 8;
+    VPIN sigid = GETHIGHFLASHW(RMFT2::SignalDefinitions,sigpos);
+    VPIN redpin = GETHIGHFLASHW(RMFT2::SignalDefinitions, sigpos + 2);
+    VPIN amberpin = GETHIGHFLASHW(RMFT2::SignalDefinitions, sigpos + 4);
+    VPIN greenpin = GETHIGHFLASHW(RMFT2::SignalDefinitions, sigpos + 6);
+
+    // LED or similar 3 pin signal, (all pins zero would be a virtual signal)
+    // If amberpin is zero, synthesise amber from red+green
+    const byte SIMAMBER=0x00;
+    if (rag==SIGNAL_AMBER && (amberpin==0)) rag=SIMAMBER; // special case this func only
+
+    // Manage invert (HIGH on) pins
+    bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
+
+    // Check if the signal has a valid color to flash
+    if (redpin) {
+        bool redval=(rag==SIGNAL_RED || rag==SIMAMBER);
+        if (!aHigh) redval=!redval;
+        IODevice::write(redpin,redval);
+        // Flash the red light
+        if (!redval) flashSignal(redpin, id);
+    }
+    if (amberpin) {
+        bool amberval=(rag==SIGNAL_AMBER);
+        if (!aHigh) amberval=!amberval;
+        IODevice::write(amberpin,amberval);
+        // Flash the amber light
+        if (!amberval) flashSignal(amberpin, id);
+    }
+    if (greenpin) {
+        bool greenval=(rag==SIGNAL_GREEN || rag==SIMAMBER);
+        if (!aHigh) greenval=!greenval;
+        IODevice::write(greenpin,greenval);
+        // Flash the green light
+        if (!greenval) flashSignal(greenpin, id);
+    }
+}
+
+void RMFT2::flashSignal(int16_t pin, int16_t id) {
+    // Find an available signal slot or create a new one based on the pin
+    SignalState& signal = getSignalState(pin, id);
+
+    // If the signal is not already flashing, start it
+    if (!signal.isFlashing) {
+        signal.isFlashing = true;
+        signal.lastFlashTime = millis();
+        signal.flashInterval = 500; // Flash every 500 milliseconds (adjustable)
+        signal.isOn = false; // Start with the signal off
+    }
+}
+
+// Function to add a new signal state
+void RMFT2::addNewSignal(SignalState newSignal) {
+    if (currentSignalIndex < MAX_SIGNALS) {  // Check to avoid out-of-bounds access
+        flashingSignals[currentSignalIndex] = newSignal;
+        currentSignalIndex++;
+    } else {
+        // Handle the case when the array is full
+        Serial.println("Error: Maximum number of flashing signals reached.");
+    }
+}
+
+SignalState& RMFT2::getSignalState(int16_t pin, int16_t id) {
+    // Find or create a signal state based on the pin (no need for color)
+    for (int i = 0; i < MAX_SIGNALS; ++i) {
+        if (flashingSignals[i].id == id) {
+            return flashingSignals[i];
+        }
+    }
+    
+    // If no matching signal state is found, create and return a new one
+    SignalState newSignal;
+    newSignal.pin = pin;
+    newSignal.id = id;
+    newSignal.isFlashing = false;
+    newSignal.isOn = false;
+    addNewSignal(newSignal);
+    return flashingSignals[currentSignalIndex];
+}
+
+SignalState* RMFT2::getSignalStateIfExisting(int16_t pin) {
+    // Find or create a signal state based on the pin (no need for color)
+    for (int i = 0; i < MAX_SIGNALS; ++i) {
+        DIAG(F("pins %d == %d"),flashingSignals[i].id,pin);
+        if (flashingSignals[i].id == pin) {
+            return &flashingSignals[i];
+        }
+    }
+    return nullptr;
+}
+
+void RMFT2::manageFlashing() {
+    unsigned long currentMillis = millis();
+
+    // Iterate over the signals and manage their flashing state
+    for (int i = 0; i < MAX_SIGNALS; ++i) {
+        SignalState& signal = flashingSignals[i];
+
+        // If the signal is flashing
+        if (signal.isFlashing) {
+            if (currentMillis - signal.lastFlashTime >= 500) {
+                // Toggle the signal state
+                signal.isOn = !signal.isOn;
+                signal.lastFlashTime = currentMillis;
+
+                // Update the pin state
+                IODevice::write(signal.pin, signal.isOn);
+            }
+        }
+    }
 }
 
 /* static */ bool RMFT2::isSignal(int16_t id,char rag) {

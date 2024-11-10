@@ -29,6 +29,9 @@
 #undef AFTER
 #undef ALIAS
 #undef AMBER
+#undef FLASHING_RED
+#undef FLASHING_AMBER
+#undef FLASHING_GREEN
 #undef ANOUT
 #undef AT
 #undef ATGTE
@@ -154,6 +157,9 @@
 #define AFTER(sensor_id)
 #define ALIAS(name,value...)
 #define AMBER(signal_id)
+#define FLASHING_RED(signal_id)
+#define FLASHING_AMBER(signal_id)
+#define FLASHING_GREEN(signal_id)
 #define ANOUT(vpin,value,param1,param2)
 #define AT(sensor_id)
 #define ATGTE(sensor_id,value) 
