@@ -570,7 +570,7 @@ bool RMFT2::skipIfBlock() {
 }
 
 void RMFT2::loop() {
-  manageFlashing();
+  // manageFlashing();
   // Round Robin call to a RMFT task each time
   if (loopTask==NULL) return;
   loopTask=loopTask->next;
@@ -823,15 +823,18 @@ void RMFT2::loop2() {
     break;
 
   case OPCODE_FLASHING_RED:
-    handleFlashing(operand, SIGNAL_RED);
+    // handleFlashing(operand, SIGNAL_RED);
+    doSignal(operand,SIGNAL_RED);
     break;
 
   case OPCODE_FLASHING_AMBER:
-    handleFlashing(operand, SIGNAL_AMBER);
+    // handleFlashing(operand, SIGNAL_AMBER);
+    doSignal(operand,SIGNAL_AMBER);
     break;
 
   case OPCODE_FLASHING_GREEN:
-    handleFlashing(operand, SIGNAL_GREEN);
+    // handleFlashing(operand, SIGNAL_GREEN);
+    doSignal(operand,SIGNAL_GREEN);
     break;
     
   case OPCODE_FON:
@@ -1102,12 +1105,12 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
   // Manage invert (HIGH on) pins
   bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
 
-  SignalState* signal = getSignalStateIfExisting(id);
-  if (signal != nullptr) {
-    signal->isFlashing = false;
-    signal->isOn = false;
-    signal->lastFlashTime = 0;
-  }
+//  SignalState* signal = getSignalStateIfExisting(id);
+//  if (signal != nullptr) {
+//    signal->isFlashing = false;
+//    signal->isOn = false;
+//    signal->lastFlashTime = 0;
+//  }
 
   // set the three pins 
   if (redpin) {
@@ -1128,7 +1131,6 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
 }
 
 void RMFT2::handleFlashing(int16_t id, char rag) {
-    // Assuming 'id' includes information like signal type and the color to blink
     // Here, you can control the flashing of the signal.
     
     // Get the signal's configuration
@@ -1153,39 +1155,45 @@ void RMFT2::handleFlashing(int16_t id, char rag) {
     bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
 
     // Check if the signal has a valid color to flash
+    DIAG(F("redpin: %d"),redpin);
     if (redpin) {
-        bool redval=(rag==SIGNAL_RED || rag==SIMAMBER);
+        bool redval=(rag==SIGNAL_RED);
         if (!aHigh) redval=!redval;
-        IODevice::write(redpin,redval);
+        // IODevice::write(redpin,redval);
         // Flash the red light
-        if (!redval) flashSignal(redpin, id);
+        DIAG(F("redval: %b | id: %d"),redval,id);
+        if (!redval) flashSignal(redpin, id);// aqui a validação !redval pode estar invertendo o valor e portanto ligando a luz
     }
+    DIAG(F("amberpin: %d"),amberpin);
     if (amberpin) {
         bool amberval=(rag==SIGNAL_AMBER);
         if (!aHigh) amberval=!amberval;
-        IODevice::write(amberpin,amberval);
+        // IODevice::write(amberpin,amberval);
         // Flash the amber light
+        DIAG(F("amberval: %b | id: %d"),amberval,id);
         if (!amberval) flashSignal(amberpin, id);
     }
+    DIAG(F("greenpin: %d"),greenpin);
     if (greenpin) {
         bool greenval=(rag==SIGNAL_GREEN || rag==SIMAMBER);
         if (!aHigh) greenval=!greenval;
-        IODevice::write(greenpin,greenval);
+        // IODevice::write(greenpin,greenval);
         // Flash the green light
+        DIAG(F("greenval: %b | id: %d"),greenval,id);
         if (!greenval) flashSignal(greenpin, id);
     }
 }
 
 void RMFT2::flashSignal(int16_t pin, int16_t id) {
     // Find an available signal slot or create a new one based on the pin
-    SignalState& signal = getSignalState(pin, id);
+    SignalState& signal = getSignalState(pin, id); // pode estar criando um sinal vermelho aceso, mas não pisca depois
 
     // If the signal is not already flashing, start it
     if (!signal.isFlashing) {
         signal.isFlashing = true;
         signal.lastFlashTime = millis();
         signal.flashInterval = 500; // Flash every 500 milliseconds (adjustable)
-        signal.isOn = false; // Start with the signal off
+        signal.isOn = true; // Start with the signal off
     }
 }
 
@@ -1193,6 +1201,7 @@ void RMFT2::flashSignal(int16_t pin, int16_t id) {
 void RMFT2::addNewSignal(SignalState newSignal) {
     if (currentSignalIndex < MAX_SIGNALS) {  // Check to avoid out-of-bounds access
         flashingSignals[currentSignalIndex] = newSignal;
+ //       DIAG(F("pin: %d | id: %d | isOn: %b | [%d]"),newSignal.pin,newSignal.id,newSignal.isOn,currentSignalIndex);
         currentSignalIndex++;
     } else {
         // Handle the case when the array is full
@@ -1201,9 +1210,15 @@ void RMFT2::addNewSignal(SignalState newSignal) {
 }
 
 SignalState& RMFT2::getSignalState(int16_t pin, int16_t id) {
+    // reset all lights from a signal
+    for (int i = 0; i < MAX_SIGNALS; ++i) {
+      if (flashingSignals[i].id == id) {
+        flashingSignals[i].isFlashing = false;
+      }
+    }
     // Find or create a signal state based on the pin (no need for color)
     for (int i = 0; i < MAX_SIGNALS; ++i) {
-        if (flashingSignals[i].id == id) {
+        if (flashingSignals[i].pin == pin) {
             return flashingSignals[i];
         }
     }
@@ -1212,17 +1227,17 @@ SignalState& RMFT2::getSignalState(int16_t pin, int16_t id) {
     SignalState newSignal;
     newSignal.pin = pin;
     newSignal.id = id;
-    newSignal.isFlashing = false;
-    newSignal.isOn = false;
+    newSignal.isFlashing = true;
+    newSignal.isOn = true;
     addNewSignal(newSignal);
     return flashingSignals[currentSignalIndex];
 }
 
-SignalState* RMFT2::getSignalStateIfExisting(int16_t pin) {
+SignalState* RMFT2::getSignalStateIfExisting(int16_t id) {
     // Find or create a signal state based on the pin (no need for color)
     for (int i = 0; i < MAX_SIGNALS; ++i) {
-        DIAG(F("pins %d == %d"),flashingSignals[i].id,pin);
-        if (flashingSignals[i].id == pin) {
+        
+        if (flashingSignals[i].id == id) {
             return &flashingSignals[i];
         }
     }
@@ -1237,14 +1252,16 @@ void RMFT2::manageFlashing() {
         SignalState& signal = flashingSignals[i];
 
         // If the signal is flashing
-        if (signal.isFlashing) {
+        if (signal.id != 0 && signal.isFlashing) {
             if (currentMillis - signal.lastFlashTime >= 500) {
                 // Toggle the signal state
                 signal.isOn = !signal.isOn;
                 signal.lastFlashTime = currentMillis;
 
+                // DIAG(F("pin: %d | id: %d | isOn: %b | [%d]"),signal.pin,signal.id,signal.isOn,i);
+
                 // Update the pin state
-                IODevice::write(signal.pin, signal.isOn);
+           //     IODevice::write(signal.pin, signal.isOn);
             }
         }
     }
@@ -1277,7 +1294,7 @@ void RMFT2::changeEvent(int16_t vpin, bool change) {
 void RMFT2::clockEvent(int16_t clocktime, bool change) {
   // Hunt for an ONTIME for this time
   if (Diag::CMD)
-   DIAG(F("Looking for clock event at : %d"), clocktime);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     (F("Looking for clock event at : %d"), clocktime);
   if (change) {
     handleEvent(F("CLOCK"),onClockLookup,clocktime);
     handleEvent(F("CLOCK"),onClockLookup,25*60+clocktime%60);
@@ -1292,7 +1309,7 @@ void RMFT2::handleEvent(const FSH* reason,LookList* handlers, int16_t id) {
   RMFT2 * task=loopTask;
   while(task) {
     if (task->onEventStartPosition==pc) {
-      DIAG(F("Recursive ON%S(%d)"),reason, id);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        (F("Recursive ON%S(%d)"),reason, id);
       return;
     }
     task=task->next;
@@ -1304,13 +1321,13 @@ void RMFT2::handleEvent(const FSH* reason,LookList* handlers, int16_t id) {
 }
 
 void RMFT2::printMessage2(const FSH * msg) {
-  DIAG(F("EXRAIL(%d) %S"),loco,msg);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (F("EXRAIL(%d) %S"),loco,msg);
 }
 static StringBuffer * buffer=NULL;
 /* thrungeString is used to stream a HIGHFLASH string to a suitable Serial
 and handle the oddities like LCD, BROADCAST and PARSE */    
 void RMFT2::thrungeString(uint32_t strfar, thrunger mode, byte id) {
-   //DIAG(F("thrunge addr=%l mode=%d id=%d"), strfar,mode,id);
+   //                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (F("thrunge addr=%l mode=%d id=%d"), strfar,mode,id);
    Print * stream=NULL;
    // Find out where the string is going 
    switch (mode) {
