@@ -25,13 +25,13 @@
 // M1M1M2
 #define M1_M1 122
 #define M1_M2 125
-#define M1_YARD 127
+#define M1_YARD 126
 // M2M1LEAD
 #define M2_M1 141
 #define M2_LEAD 143
 // LEADM2
-#define LEAD_M2 129
-#define LEAD_YARD 130
+#define LEAD_M2 128
+#define LEAD_YARD 131
 
 // YARD
 #define YARD_EXIT 107

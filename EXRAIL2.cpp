@@ -570,7 +570,7 @@ bool RMFT2::skipIfBlock() {
 }
 
 void RMFT2::loop() {
-  // manageFlashing();
+  manageFlashing();
   // Round Robin call to a RMFT task each time
   if (loopTask==NULL) return;
   loopTask=loopTask->next;
@@ -823,18 +823,15 @@ void RMFT2::loop2() {
     break;
 
   case OPCODE_FLASHING_RED:
-    // handleFlashing(operand, SIGNAL_RED);
-    doSignal(operand,SIGNAL_RED);
+    handleFlashing(operand, SIGNAL_RED);
     break;
 
   case OPCODE_FLASHING_AMBER:
-    // handleFlashing(operand, SIGNAL_AMBER);
-    doSignal(operand,SIGNAL_AMBER);
+    handleFlashing(operand, SIGNAL_AMBER);
     break;
 
   case OPCODE_FLASHING_GREEN:
-    // handleFlashing(operand, SIGNAL_GREEN);
-    doSignal(operand,SIGNAL_GREEN);
+    handleFlashing(operand, SIGNAL_GREEN);
     break;
     
   case OPCODE_FON:
@@ -1105,12 +1102,12 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
   // Manage invert (HIGH on) pins
   bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
 
-//  SignalState* signal = getSignalStateIfExisting(id);
-//  if (signal != nullptr) {
-//    signal->isFlashing = false;
-//    signal->isOn = false;
-//    signal->lastFlashTime = 0;
-//  }
+ SignalState* signal = getSignalStateIfExisting(id);
+ if (signal != nullptr) {
+   signal->isFlashing = false;
+   signal->isOn = false;
+   signal->lastFlashTime = 0;
+ }
 
   // set the three pins 
   if (redpin) {
@@ -1131,13 +1128,9 @@ int16_t RMFT2::getSignalSlot(int16_t id) {
 }
 
 void RMFT2::handleFlashing(int16_t id, char rag) {
-    // Here, you can control the flashing of the signal.
-    
-    // Get the signal's configuration
     int16_t sigslot = getSignalSlot(id);
     if (sigslot<0) return; 
   
-    // keep track of signal state 
     setFlag(sigslot,rag,SIGNAL_MASK);
     
     int16_t sigpos = sigslot * 8;
@@ -1154,46 +1147,41 @@ void RMFT2::handleFlashing(int16_t id, char rag) {
     // Manage invert (HIGH on) pins
     bool aHigh=sigid & ACTIVE_HIGH_SIGNAL_FLAG;
 
-    // Check if the signal has a valid color to flash
-    DIAG(F("redpin: %d"),redpin);
     if (redpin) {
         bool redval=(rag==SIGNAL_RED);
         if (!aHigh) redval=!redval;
-        // IODevice::write(redpin,redval);
-        // Flash the red light
-        DIAG(F("redval: %b | id: %d"),redval,id);
-        if (!redval) flashSignal(redpin, id);// aqui a validação !redval pode estar invertendo o valor e portanto ligando a luz
+        IODevice::write(redpin,redval);
+
+        if (!redval) flashSignal(redpin, id);
     }
-    DIAG(F("amberpin: %d"),amberpin);
+
     if (amberpin) {
         bool amberval=(rag==SIGNAL_AMBER);
         if (!aHigh) amberval=!amberval;
-        // IODevice::write(amberpin,amberval);
-        // Flash the amber light
-        DIAG(F("amberval: %b | id: %d"),amberval,id);
+        IODevice::write(amberpin,amberval);
+
         if (!amberval) flashSignal(amberpin, id);
     }
-    DIAG(F("greenpin: %d"),greenpin);
+
     if (greenpin) {
         bool greenval=(rag==SIGNAL_GREEN || rag==SIMAMBER);
         if (!aHigh) greenval=!greenval;
-        // IODevice::write(greenpin,greenval);
-        // Flash the green light
-        DIAG(F("greenval: %b | id: %d"),greenval,id);
+        IODevice::write(greenpin,greenval);
+
         if (!greenval) flashSignal(greenpin, id);
     }
 }
 
 void RMFT2::flashSignal(int16_t pin, int16_t id) {
     // Find an available signal slot or create a new one based on the pin
-    SignalState& signal = getSignalState(pin, id); // pode estar criando um sinal vermelho aceso, mas não pisca depois
+    SignalState& signal = getSignalState(pin, id);
 
     // If the signal is not already flashing, start it
     if (!signal.isFlashing) {
         signal.isFlashing = true;
         signal.lastFlashTime = millis();
-        signal.flashInterval = 500; // Flash every 500 milliseconds (adjustable)
-        signal.isOn = true; // Start with the signal off
+        signal.flashInterval = 500;
+        signal.isOn = true;
     }
 }
 
@@ -1201,7 +1189,6 @@ void RMFT2::flashSignal(int16_t pin, int16_t id) {
 void RMFT2::addNewSignal(SignalState newSignal) {
     if (currentSignalIndex < MAX_SIGNALS) {  // Check to avoid out-of-bounds access
         flashingSignals[currentSignalIndex] = newSignal;
- //       DIAG(F("pin: %d | id: %d | isOn: %b | [%d]"),newSignal.pin,newSignal.id,newSignal.isOn,currentSignalIndex);
         currentSignalIndex++;
     } else {
         // Handle the case when the array is full
@@ -1258,10 +1245,8 @@ void RMFT2::manageFlashing() {
                 signal.isOn = !signal.isOn;
                 signal.lastFlashTime = currentMillis;
 
-                // DIAG(F("pin: %d | id: %d | isOn: %b | [%d]"),signal.pin,signal.id,signal.isOn,i);
-
                 // Update the pin state
-           //     IODevice::write(signal.pin, signal.isOn);
+               IODevice::write(signal.pin, signal.isOn);
             }
         }
     }
