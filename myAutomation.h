@@ -1,7 +1,7 @@
 #include "signalStates.h"
 #include "turnoutDefinitions.h"
 // REFERENCE
-// SERVO_TURNOUT(id, pin, active_angle, inactive_angle, profile [, "description"])
+// SERVO_TURNOUT(id, pin, active_angle (t), inactive_angle (c), profile [, "description"])
 
 // ----LMain-M1-Lead----
 
@@ -11,7 +11,7 @@ SIGNAL(105, 0, 104) // [S 105] M1->LMain
 SIGNAL(107, 106, 0) // [S 115] Lead->LMain
 
 // [T 101 Left-Main-Lead]
-SERVO_TURNOUT(CP_101, 101, 300, 250, Medium, "Left-Main-Lead")
+SERVO_TURNOUT(CP_101, 101, 265, 200, Medium, "Left-Main-Lead")
 
 // ---------------------
 
@@ -44,8 +44,8 @@ SIGNAL(M2_LEAD, 142, 0) // [S 144] M2-LEAD
 SIGNAL(LEAD_M2, 127, 0) // [S 128] LEAD-M2
 SIGNAL(LEAD_YARD, 0, 0) // [S 131] LEAD-YARD
 
-SERVO_TURNOUT(CP_103, 116, 400, 290, Medium, "Crossover-Main-Lead")
-SERVO_TURNOUT(CP_104, 117, 450, 250, Medium, "Crossover-Lead-Main")
+SERVO_TURNOUT(CP_103, 116, 400, 300, Medium, "Crossover-Main-Lead")
+SERVO_TURNOUT(CP_104, 117, 400, 260, Medium, "Crossover-Lead-Main")
 SERVO_TURNOUT(CP_105, 118, 150, 240, Medium, "Crossover-Main-Main2")
 SERVO_TURNOUT(CP_106, 133, 475, 300, Medium, "Crossover-Main2-Main")
 
